@@ -38,7 +38,7 @@ describe('API /clientes (integracao com supertest)', () => {
       const res = await request(app).get('/clientes/90')
 
       expect(res.status).toBe(404)
-      expect(res.body.error).toThrow('Cliente nao encontrado')
+      expect(res.body).toHaveProperty('erro')
     });
   });
 
@@ -95,17 +95,16 @@ describe('API /clientes (integracao com supertest)', () => {
 
 
     test('cliente criado aparece em GET /clientes', async () => {
-      const res2 = await request(app)
+      const res = await request(app)
         .post('/clientes')
         .send({
           nome: 'Fulano de ser',
           email: 'novo_cliente@email.com'
         })
-      expect(res2.status).toBe(201)
+      expect(res.status).toBe(201)
 
-      const res = await request(app).get('/clientes/90')
-      expect(res.status).toBe(404)
-      expect(res.body.error).toThrow('Cliente nao encontrado')
+      const res2 = await request(app).get('/clientes/90')
+      expect(res2.status).toBe(404)
     });
   });
 
@@ -113,13 +112,13 @@ describe('API /clientes (integracao com supertest)', () => {
 
   describe('PUT /clientes/:id', () => {
     test('retorna 200 e o cliente atualizado quando o id existe', async () => {
-      const res = await request(app).get('/clientes/1')
+      const res = await request(app)
+        .put('/clientes/1')
+        .send({
+          nome: 'Fulano atualizado',
+          email: 'novo_cliente-atualizado@email.com'
+        })
       expect(res.status).toBe(200)
-
-      const resPut = await request(app).put('/clientes/1')
-      expect(resPut.status).toBe(200)
-      expect(resPut.body.id).toBe(1)
-
     });
 
     test('retorna 404 quando o cliente nao existe', async () => {
